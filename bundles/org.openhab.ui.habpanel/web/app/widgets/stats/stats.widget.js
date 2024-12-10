@@ -90,6 +90,7 @@
             	var startDate = new Date();
                 switch (vm.widget.period)
                 {
+                    case '3D': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 3.1*24*60*60*1000); break;
                     case 'W':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 7.5*24*60*60*1000); break;
                     case '2W': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 2*7.25*24*60*60*1000); break;
                     case 'M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 1); break;
@@ -109,12 +110,10 @@
 
             var getData = function () {
 
-                var hasInterval = vm.widget.axis.x && vm.widget.axis.x.interval;
                 vm.rawdata = [];
                 for (var i = 0; i < vm.widget.series.length; i++) {
-                    var hasColumns = vm.widget.series[i].display_columns;
                     vm.rawdata[i] = $http.get('/rest/persistence/items/' + vm.widget.series[i].item + "?"
-                        + (hasColumns ? "boundary=false" : "boundary=true") 
+                        + "boundary=false"
                         + "&starttime=" + startDate.toISOString() 
                         + "&endtime=" + endDate.toISOString() 
                         + (vm.widget.service ? '&serviceId=' + vm.widget.service : ''));
@@ -127,82 +126,20 @@
 	                    var seriesname = values[i].data.name;
 
                         var finaldata = [];
-                        if (vm.widget.series[i].display_columns)
-                        {
-                            finaldata = values[i].data.data;
+                        finaldata = values[i].data.data;
 
-                            angular.forEach(finaldata, function (datapoint) {
-                                datapoint.state = datapoint.state.replace("ON",1);
-                                datapoint.state = datapoint.state.replace("OFF",0);
-                                datapoint.time = new Date(datapoint.time);
-                                datapoint.state = parseFloat(datapoint.state);
-                            });
-                            var endPoint = {
-                                state: null,
-                                time: endDate
-                            }
-                            finaldata.push(endPoint);
+                        angular.forEach(finaldata, function (datapoint) {
+                            datapoint.state = datapoint.state.replace("ON",1);
+                            datapoint.state = datapoint.state.replace("OFF",0);
+                            datapoint.time = new Date(datapoint.time);
+                            datapoint.state = parseFloat(datapoint.state);
+                        });
+                        var endPoint = {
+                            state: null,
+                            time: endDate
                         }
-                        else
-                        {
-                            var gridFactor = hasInterval ? vm.widget.axis.x.interval * 60 * 1000 : 60 * 1000;
-                            var startDate = startTime();
-                            var prevTime = startTime();
-                            var prevValue = 0.0;
-                            var prevIndex = 0;
-                            angular.forEach(values[i].data.data, function (datapoint, index) 
-                            {
-                                datapoint.time = new Date(datapoint.time);
-                                // align timestamps
-                                if (index > 0 && hasInterval)
-                                {
-                                    datapoint.time.setTime( Math.floor(datapoint.time.getTime() / gridFactor) * gridFactor);
-                                }
-                                if (prevTime != datapoint.time.getTime() || index == 0)
-                                {
-                                    prevIndex = finaldata.length;
-                                    datapoint.state.replace("ON",1);
-                                    datapoint.state.replace("OFF",0);
-                                    datapoint.state = parseFloat(datapoint.state);
+                        finaldata.push(endPoint);
 
-                                    // was there a value missing?
-                                    var distance = datapoint.time.getTime() - prevTime;
-                                    while (hasInterval && distance > gridFactor && index > 0)
-                                    {
-                                        var newValue = parseFloat(datapoint.state);
-                                        var diff = newValue - prevValue;
-                                        var insertValue = prevValue + diff / parseFloat(distance / gridFactor);
-                                        var insertpoint = {
-                                            time: new Date(prevTime+gridFactor),
-                                            state: insertValue                                        
-                                        };
-                                        finaldata.push(insertpoint)
-                                        prevTime = insertpoint.time.getTime()
-                                        prevValue = insertValue;
-                                        distance = datapoint.time.getTime() - prevTime;
-                                    }
-
-                                    finaldata.push(datapoint)
-                                    prevTime = datapoint.time.getTime()
-                                    prevValue = parseFloat(datapoint.state);
-                                }
-                                else if (prevIndex > 0)
-                                {
-                                    finaldata[prevIndex].state = (parseFloat(datapoint.state) + prevValue) / 2.0
-                                }                        
-                            });
-                            // interpolate last datapoint if missing
-                            var item = OHService.getItem(values[i].data.name);
-                            if (item)
-                            {
-                                var insertpoint = {
-                                    state: parseFloat(item.state),
-                                    time: new Date()
-                                }
-                                finaldata.push(insertpoint)
-                            }
-                            //console.log(finaldata);
-                        }
                         vm.datasets[seriesname] = finaldata;
                     }
 
@@ -235,7 +172,7 @@
                                         }
                                         return $filter('date')(value, 'EEE d');
                                     }
-                                    return $filter('date')(value, 'HH:mm');
+                                    return $filter('date')(value, 'EEE d');
                                 }
                             },
                             y: { padding: { min: 0, max: 8 } }
@@ -276,12 +213,7 @@
                             type: [],
                             id: vm.widget.series[i].item
                         };
-                        if (vm.widget.series[i].display_line) seriesoptions.type.push("line");
-                        if (vm.widget.series[i].display_thin) seriesoptions.type.push("dashed-line");
-                        if (vm.widget.series[i].display_area) seriesoptions.type.push("area");
-                        if (vm.widget.series[i].display_dots) seriesoptions.type.push("dot");
-                        if (vm.widget.series[i].display_columns) seriesoptions.type.push("column");
-                        if (vm.widget.series[i].smooth) seriesoptions.interpolation = { mode: "monotone"};
+                        seriesoptions.type.push("column");
 
                         vm.interactiveChartOptions.series.push(seriesoptions);
                     }
