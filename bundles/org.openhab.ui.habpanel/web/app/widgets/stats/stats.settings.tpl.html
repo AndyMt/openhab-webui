@@ -2,12 +2,12 @@
     <form name="_form" class="form-horizontal" ng-submit="submit(_form)">
         <div class="modal-header">
             <button type="button" class="close" ng-click="dismiss()" aria-hidden="true">&times;</button>
-            <h3 translate-keep-content translate="widget.chart.settings.header">Chart Settings</h3>
+            <h3 translate-keep-content translate="widget.stats.settings.header">Stat Settings</h3>
         </div>
 
         <div class="modal-body">
             <uib-tabset>
-                <uib-tab heading="{{'General' | translation:'widget.chart.general'}}">
+                <uib-tab heading="{{'General' | translation:'widget.stats.general'}}">
                     <br />
                     <div class="form-group" ng-class="{error: _form.name.$error && _form.submitted}">
                         <label class="control-label col-lg-3 col-md-3" translate>Name</label>
@@ -15,39 +15,16 @@
                             <input name="name" type="text" ng-model="form.name" class="form-control" />
                         </div>
                     </div>
-                    <div class="form-group" ng-class="{error: _form.charttype.$error && _form.submitted}">
-                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.general.type">Type</label>
+                    <div class="form-group" ng-class="{error: _form.name.$error && _form.submitted}">
+                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.stats.general.service">Persistence service</label>
                         <div class="col-lg-9 col-md-9">
-                            <select ng-model="form.charttype" class="form-control">
-                                <option value="default" translate-keep-content translate="widget.chart.general.type.default">Default</option>
-                                <option value="rrd4j" translate-keep-content translate="widget.chart.general.type.rrd4j">RRD4j (rrd4j persistence service only)</option>
-                                <option value="interactive" translate-keep-content translate="widget.chart.general.type.interactive">n3-line-chart (interactive)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" ng-class="{error: _form.item.$error && _form.submitted}" ng-if="form.charttype!='interactive'">
-                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.general.itemgroup">openHAB Item or Group</label>
-                        <div class="col-lg-9 col-md-9">
-                            <item-picker ng-model="form.item"></item-picker>
-                        </div>
-                    </div>
-                    <div class="form-group" ng-class="{error: _form.name.$error && _form.submitted}" ng-if="form.charttype=='interactive'">
-                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.general.service">Persistence service</label>
-                        <div class="col-lg-9 col-md-9">
-                            <input name="name" type="text" ng-model="form.service" class="form-control" placeholder="{{'rrd4j, mysql, influxdb... Leave blank for default' | translation:'widget.chart.general.service.hint'}}" />
+                            <input name="name" type="text" ng-model="form.service" class="form-control" placeholder="{{'rrd4j, mysql, influxdb... Leave blank for default' | translation:'widget.stats.general.service.hint'}}" />
                         </div>
                     </div>
                     <div class="form-group" ng-class="{error: _form.period.$error && _form.submitted}">
-                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.general.period">Period</label>
+                        <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.stats.general.period">Period</label>
                         <div class="col-lg-9 col-md-9">
                             <select ng-model="form.period" class="form-control">
-                                <option value="h">h</option>
-                                <option value="4h">4h</option>
-                                <option value="8h">8h</option>
-                                <option value="12h">12h</option>
-                                <option value="D">D</option>
-                                <option value="2D">2D</option>
-                                <option value="3D">3D</option>
                                 <option value="W">W</option>
                                 <option value="2W">2W</option>
                                 <option value="M">M</option>
@@ -57,26 +34,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group" ng-class="{error: _form.showlegend.$error && _form.submitted}" ng-if="form.charttype=='default'">
-                        <label class="control-label col-lg-3 col-md-3">Show legend</label>
-                        <div class="col-lg-9 col-md-9">
-                            <select ng-model="form.showlegend" class="form-control">
-                                <option value="auto">Automatic</option>
-                                <option value="always">Always</option>
-                                <option value="never">Never</option>
-                            </select>
-                        </div>
-                    </div>
                 </uib-tab>
-                    <!--<div class="form-group" ng-class="{error: _form.refresh.$error && _form.submitted}">
-                        <label class="control-label col-lg-3 col-md-3">Resfresh interval</label>
-                        <div class="col-lg-5 col-md-5">
-                            <input name="name" type="text" ng-model="form.refresh" class="form-control" />
-                        </div>
-                    </div>-->
-                <uib-tab heading="{{'Axis' | translation:'widget.chart.axis'}}" ng-if="form.charttype=='interactive'">
+                <uib-tab heading="{{'Axis' | translation:'widget.stats.axis'}}" >
                     <br />
-                    <h4 translate-keep-content translate="widget.chart.axis.primary">Primary axis (y)</h4>
+                    <h4 translate-keep-content translate="widget.stats.axis.primary">Primary axis (y)</h4>
                     
                     <div class="form-group">
                         <div class="col-xs-6">
@@ -101,7 +62,7 @@
                                 <div class="col-xs-6">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" name="vertical" ng-model="form.axis.y.includezero" /> <span translate-keep-content translate="widget.chart.axis.includezero">Include zero</span>
+                                            <input type="checkbox" name="vertical" ng-model="form.axis.y.includezero" /> <span translate-keep-content translate="widget.stats.axis.includezero">Include zero</span>
                                         </label>
                                     </div>
                                 </div>
@@ -125,7 +86,7 @@
                         </div>-->
                     </div>
 
-                    <h4 translate-keep-content translate="widget.chart.axis.secondary">Secondary axis (y2)</h4>
+                    <h4 translate-keep-content translate="widget.stats.axis.secondary">Secondary axis (y2)</h4>
 
                     <div class="col-lg-12 col-md-12">
                         <div class="form-group">
@@ -133,7 +94,7 @@
                             <div class="col-lg-9 col-md-9">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" name="vertical" ng-model="form.axis.y2.enabled" /> <span  translate-keep-content translate="widget.chart.axis.enabled">Enabled</span>
+                                        <input type="checkbox" name="vertical" ng-model="form.axis.y2.enabled" /> <span  translate-keep-content translate="widget.stats.axis.enabled">Enabled</span>
                                     </label>
                                 </div>
                             </div>
@@ -163,7 +124,7 @@
                                 <div class="col-xs-6">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" name="vertical" ng-model="form.axis.y2.includezero" /> <span translate-keep-content translate="widget.chart.axis.includezero">Include zero</span>
+                                            <input type="checkbox" name="vertical" ng-model="form.axis.y2.includezero" /> <span translate-keep-content translate="widget.stats.axis.includezero">Include zero</span>
                                         </label>
                                     </div>
                                 </div>
@@ -192,7 +153,7 @@
                         </div>
                     </div>
                 </uib-tab>
-                <uib-tab heading="{{'Series' | translation:'widget.chart.series'}}" ng-if="form.charttype=='interactive'">
+                <uib-tab heading="{{'Series' | translation:'widget.stats.series'}}" >
                     <br />
                     <button type="button" class="btn" ng-click="addSeries()"><i class="glyphicon glyphicon-plus"></i></button>
                     <br /><br />
@@ -205,14 +166,14 @@
                                     <button type="button" class="btn pull-right" ng-click="moveDnSeries(series)"><i class="glyphicon glyphicon-arrow-down"></i></button>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.series.axis">Axis</label>
+                                    <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.stats.series.axis">Axis</label>
                                     <div class="col-lg-7 col-md-7">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="radio" ng-model="series.axis" value="y" /> <span translate-keep-content translate="widget.chart.series.axis.primary">Primary</span>
+                                                <input type="radio" ng-model="series.axis" value="y" /> <span translate-keep-content translate="widget.stats.series.axis.primary">Primary</span>
                                             </label>
                                             <label>
-                                                <input type="radio" ng-model="series.axis" value="y2" /> <span translate-keep-content translate="widget.chart.series.axis.secondary">Secondary</span>
+                                                <input type="radio" ng-model="series.axis" value="y2" /> <span translate-keep-content translate="widget.stats.series.axis.secondary">Secondary</span>
                                             </label>
                                         </div>
                                     </div>
@@ -242,26 +203,26 @@
 
                             <div class="col-lg-12 col-md-12">
                                 <div class="form-group">
-                                    <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.chart.series.display">Display</label>
+                                    <label class="control-label col-lg-3 col-md-3" translate-keep-content translate="widget.stats.series.display">Display</label>
                                     <div class="col-lg-9 col-md-9">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" ng-model="series.display_line" value="line" /> <span translate-keep-content translate="widget.chart.series.display.line">Line</span> &nbsp;
+                                                <input type="checkbox" ng-model="series.display_line" value="line" /> <span translate-keep-content translate="widget.stats.series.display.line">Line</span> &nbsp;
                                             </label>
                                             <label>
-                                                <input type="checkbox" ng-model="series.display_thin" value="thin" /> <span translate-keep-content translate="widget.chart.series.display.thin-line">Thin</span> &nbsp;
+                                                <input type="checkbox" ng-model="series.display_thin" value="thin" /> <span translate-keep-content translate="widget.stats.series.display.thin-line">Thin</span> &nbsp;
                                             </label>
                                             <label>
-                                                <input type="checkbox" ng-model="series.display_area" value="area" /> <span translate-keep-content translate="widget.chart.series.display.area">Area</span> &nbsp;
+                                                <input type="checkbox" ng-model="series.display_area" value="area" /> <span translate-keep-content translate="widget.stats.series.display.area">Area</span> &nbsp;
                                             </label>
                                             <label>
-                                                <input type="checkbox" ng-model="series.display_dots" value="dot" /> <span translate-keep-content translate="widget.chart.series.display.dots">Dots</span>
+                                                <input type="checkbox" ng-model="series.display_dots" value="dot" /> <span translate-keep-content translate="widget.stats.series.display.dots">Dots</span>
                                             </label>
                                             <label>
-                                                <input type="checkbox" ng-model="series.display_columns" value="columns" /> <span translate-keep-content translate="widget.chart.series.display.columns">Columns</span> &nbsp;
+                                                <input type="checkbox" ng-model="series.display_columns" value="columns" /> <span translate-keep-content translate="widget.stats.series.display.columns">Columns</span> &nbsp;
                                             </label>
                                             <label>
-                                                <input type="checkbox" ng-model="series.smooth" value="smooth" /> <span translate-keep-content translate="widget.chart.series.display.smooth">Smooth</span> &nbsp;
+                                                <input type="checkbox" ng-model="series.smooth" value="smooth" /> <span translate-keep-content translate="widget.stats.series.display.smooth">Smooth</span> &nbsp;
                                             </label>
                                         </div>
                                     </div>
@@ -277,7 +238,7 @@
                         <div class="col-lg-9 col-md-9">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="vertical" ng-model="form.liveUpdates.enabled" /> <span translate-keep-content translate="widget.chart.series.liveupdate">Live update (experimental)</span>
+                                    <input type="checkbox" name="vertical" ng-model="form.liveUpdates.enabled" /> <span translate-keep-content translate="widget.stats.series.liveupdate">Live update (experimental)</span>
                                 </label>
                             </div>
                         </div>
@@ -288,7 +249,7 @@
                         <div class="col-lg-9 col-md-9">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="vertical" ng-model="form.liveUpdates.fillValues" /> <span translate-keep-content translate="widget.chart.series.liveupdate.fillvalues">Repeat other series' current values on update if necessary</span>
+                                    <input type="checkbox" name="vertical" ng-model="form.liveUpdates.fillValues" /> <span translate-keep-content translate="widget.stats.series.liveupdate.fillvalues">Repeat other series' current values on update if necessary</span>
                                 </label>
                             </div>
                         </div>

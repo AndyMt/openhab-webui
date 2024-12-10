@@ -20,6 +20,11 @@
     --chart-fill: #89a;
     --chart-tooltip: #fff;
     --chart-default-theme: "white";
+    /* Stats widget */
+    --stats-stroke: #456;
+    --stats-fill: #89a;
+    --stats-tooltip: #fff;
+    --stats-default-theme: "white";
     /* Color picker widget */
     --colorpicker-border: #3960ff;
     --colorpicker-stroke: #456;

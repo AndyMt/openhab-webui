@@ -14,6 +14,7 @@
             });
         });
 
+    var Width = 0;
     widgetTimeline.$inject = ['$rootScope', '$interval', 'OHService', 'tmhDynamicLocaleCache'];
     function widgetTimeline($rootScope, $interval, OHService, tmhDynamicLocaleCache) {
         // Usage: <widget-timeline ng-model="widget" />
@@ -46,8 +47,9 @@
 
                 var parentElement = element[0].parentNode.parentNode.parentNode;
 
-                var width = parentElement.style.width.replace('px', '') - 20;
+                var width = parentElement.style.width.replace('px', '') - 40;
                 var height = parentElement.style.height.replace('px', '') - 20;
+                Width = width
 
                 var colorScale = d3.scale.ordinal().range(scope.colorScale.colors).domain(scope.colorScale.states);
 
@@ -77,17 +79,20 @@
                     ["1 %b", function(d) { return d.getDate() == 1 }]
                 ]);
 
+                var tickCount =  Width < 400 ? 6 : 12;
                 var chart = d3.timeline()
                 .colors(colorScale)
                 .colorProperty('state')
                 .width(0)
                 .tickFormat({
-                    format: customTimeFormat,
-                    tickSize: 6
+                    numTicks: tickCount,
+                    tickSize: 6,                    
+                    format: customTimeFormat
                 })
                 .showTimeAxisTick()
                 .stack()
                 .margin({left:scope.margin_left + 20, right:22, top:0, bottom:0})
+                .scroll(function() {})
                 .mouseover(function (d, i, datum) {
                     scope.$apply(function () {
                         scope.item = datum.label;
@@ -230,7 +235,7 @@
                     partitioned[values[i].data.name] = partitionData(values[i].data);
                 }
 
-                $scope.margin_left = 20;
+                $scope.margin_left = -22;
 
                 for (var i = 0; i < vm.widget.series.length; i++) {
                     if (!partitioned[vm.widget.series[i].item]) {
@@ -239,9 +244,9 @@
 
                     var label = vm.widget.series[i].name || vm.widget.series[i].item;
                     var textWidth = getTextWidth(label, "normal 1.5em Roboto");
-                    if ($scope.margin_left < textWidth) {
+                    /*if ($scope.margin_left < textWidth) {
                         $scope.margin_left = textWidth;
-                    }
+                    }*/
 
                     data.push({
                         label: label,
@@ -314,9 +319,34 @@
         };
 
         $scope.removeSeries = function (series) {
-            $scope.form.series.splice($scope.form.series.indexOf(series), 1);
+            if(confirm("Delete ["+series.label + "]?")) {
+                $scope.form.series.splice($scope.form.series.indexOf(series), 1);                
+            }
         }
         
+        function array_move(arr, old_index, new_index) {
+            if (new_index < 0 )
+                return new_index;
+            if (new_index >= arr.length) 
+                return new_index;
+
+            arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+            return new_index;
+        };
+
+        $scope.moveUpSeries = function (series) {
+            var index = $scope.form.series.indexOf(series);
+            $scope.accordions[index] = false;
+            index = array_move($scope.form.series, index, index-1);
+            $scope.accordions[index] = true;
+        }
+
+        $scope.moveDnSeries = function (series) {
+            var index = $scope.form.series.indexOf(series);
+            $scope.accordions[index] = false;
+            index = array_move($scope.form.series, index, index+1);
+            $scope.accordions[index] = true;
+        }
 
         $scope.dismiss = function() {
             $modalInstance.dismiss();

@@ -49,11 +49,12 @@
         function updateValue() {
             var item = OHService.getItem(vm.widget.item);
             if (!item) {
-                vm.value = vm.state = "N/A";
+                vm.value = "N/A";
                 return;
             }
             var value = item.transformedState || item.state;
-            if (vm.widget.value_format) {
+            if (!vm.widget.value_useserverformat && vm.widget.value_format) {
+                
                 if (item.type === "DateTime" || item.type === "DateTimeItem") {
                     value = $filter('date')(value, vm.widget.value_format);
                 } else if (item.type.indexOf('Number:') === 0 && value.indexOf(' ') > 0) {
@@ -72,13 +73,20 @@
                 }
             }
             vm.value = value;
-            vm.state = item.state;
 
-            var isActive = (vm.state === vm.widget.command || (vm.widget.action_type === 'navigate' && vm.widget.show_item_value && vm.state == vm.widget.navigate_active_state));
-            vm.background = (isActive) ? vm.widget.background_active : vm.widget.background;
-            vm.foreground = (isActive) ? vm.widget.foreground_active : vm.widget.foreground;
-            if (vm.widget.show_item_value) {
-                vm.value_color = themeValueFilter((isActive) ? vm.widget.value_color_active : vm.widget.value_color, 'primary-color');
+            if (vm.value === vm.widget.command
+                || (vm.widget.action_type === 'navigate' && vm.widget.show_item_value && vm.value == vm.widget.navigate_active_state)) {
+                vm.background = vm.widget.background_active;
+                vm.foreground = vm.widget.foreground_active;
+                if (vm.widget.show_item_value) {
+                    vm.value_color = themeValueFilter(vm.widget.value_color_active, 'primary-color');
+                }
+            } else {
+                vm.background = vm.widget.background;
+                vm.foreground = vm.widget.foreground;
+                if (vm.widget.show_item_value) {
+                    vm.value_color = themeValueFilter(vm.widget.value_color, 'primary-color');
+                }
             }
         }
 
@@ -123,7 +131,7 @@
 
                 case "toggle":
                     if (vm.widget.command && vm.widget.command_alt) {
-                        if (vm.state === vm.widget.command) {
+                        if (vm.value === vm.widget.command) {
                             OHService.sendCmd(this.widget.item, this.widget.command_alt);
                         } else {
                             OHService.sendCmd(this.widget.item, this.widget.command);
@@ -211,9 +219,9 @@
                         delete widget.item;
                         delete widget.navigate_active_state;
                     } else {
-                        delete widget.background_active;
-                        delete widget.foreground_active;
-                        delete widget.value_color_active;
+                        //delete widget.background_active;
+                        //delete widget.foreground_active;
+                        //delete widget.value_color_active;
                     }
 
                     break;

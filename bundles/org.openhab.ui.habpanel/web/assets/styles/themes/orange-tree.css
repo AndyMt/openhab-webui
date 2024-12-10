@@ -22,6 +22,10 @@
   --chart-fill: #89a;
   --chart-tooltip: #fff;
   --chart-default-theme: "black";
+  --stats-stroke: #456;
+  --stats-fill: #89a;
+  --stats-tooltip: #fff;
+  --stats-default-theme: "black";
   --colorpicker-border: #191716;
   --colorpicker-stroke: #456;
   --colorpicker-fill: #89a;

@@ -2,8 +2,8 @@
         .module('app')
         .controller('DashboardViewCtrl', DashboardViewController);
 
-  DashboardViewController.$inject = ['$scope', '$location', '$rootScope', '$routeParams', '$timeout', 'dashboard', 'PersistenceService', 'OHService', 'Fullscreen', 'snapRemote', 'SpeechService', 'TranslationService'];
-  function DashboardViewController($scope, $location, $rootScope, $routeParams, $timeout, dashboard, PersistenceService, OHService, Fullscreen, snapRemote, SpeechService, TranslationService) {
+  DashboardViewController.$inject = ['$scope', '$window', '$location', '$rootScope', '$routeParams', '$timeout', 'dashboard', 'PersistenceService', 'OHService', 'Fullscreen', 'snapRemote', 'SpeechService', 'TranslationService'];
+  function DashboardViewController($scope, $window, $location, $rootScope, $routeParams, $timeout, dashboard, PersistenceService, OHService, Fullscreen, snapRemote, SpeechService, TranslationService) {
     var vm = this;
     vm.dashboard = dashboard;
     vm.speakTooltip = TranslationService.translate('dashboard.toolbar.speak', 'Speak');
@@ -63,6 +63,11 @@
 
     vm.refresh = function() {
         OHService.reloadItems();
+    };
+
+    vm.reload = function() {
+        $window.history.go(0);
+        //window.location = window.location.href+'?eraseCache=true';
     };
 
     vm.goFullscreen = function() {

@@ -3,32 +3,32 @@
 
     angular
         .module('app.widgets')
-        .directive('widgetChart', widgetChart)
-        .controller('WidgetSettingsCtrl-chart', WidgetSettingsCtrlChart)
+        .directive('widgetStats', widgetStats)
+        .controller('WidgetSettingsCtrl-stats', WidgetSettingsCtrlStats)
         .config(function (WidgetsProvider) { 
             WidgetsProvider.$get().registerType({
-                type: 'chart',
-                displayName: 'Chart',
+                type: 'stats',
+                displayName: 'Statistics',
                 icon: 'stats',
-                description: 'Displays a chart'
+                description: 'Displays a bar chart'
             });
         });
 
-    widgetChart.$inject = ['$rootScope', '$timeout', '$uibModal', 'OHService'];
+    widgetStats.$inject = ['$rootScope', '$timeout', '$uibModal', 'OHService'];
 
     var Width = 0;
-    function widgetChart($rootScope, $timeout, $modal, OHService) {
-        // Usage: <widget-chart ng-model="widget" />
+    function widgetStats($rootScope, $timeout, $modal, OHService) {
+        // Usage: <widget-stats ng-model="widget" />
         //
-        // Creates: A chart widget
+        // Creates: A stats widget
         //
         var directive = {
             bindToController: true,
-            controller: ChartController,
+            controller: StatsController,
             controllerAs: 'vm',
             link: link,
             restrict: 'AE',
-            templateUrl: 'app/widgets/chart/chart.tpl.html',
+            templateUrl: 'app/widgets/stats/stats.tpl.html',
             scope: {
                 ngModel: '='
             }
@@ -40,18 +40,11 @@
                 var width = element[0].parentNode.parentNode.parentNode.style.width.replace('px', '');
                 var height = element[0].parentNode.parentNode.parentNode.style.height.replace('px', '');
                 Width = width;
-                if (scope.vm.widget.charttype === 'rrd4j') { // why?
-                    scope.vm.width = sprintf("%d", width - 109);
-                    scope.vm.height = sprintf("%d", height - 91);
-                } else if (scope.vm.widget.charttype === 'default') {
-                    scope.vm.width = sprintf("%d", width - 20);
-                    scope.vm.height = sprintf("%d", height - 20);
-                }
             });
         }
     }
-    ChartController.$inject = ['$rootScope', '$scope', '$timeout', '$http', '$q', '$filter', 'OHService', 'themeValueFilter'];
-    function ChartController ($rootScope, $scope, $timeout, $http, $q, $filter, OHService, themeValueFilter) {
+    StatsController.$inject = ['$rootScope', '$scope', '$timeout', '$http', '$q', '$filter', 'OHService', 'themeValueFilter'];
+    function StatsController ($rootScope, $scope, $timeout, $http, $q, $filter, OHService, themeValueFilter) {
         var vm = this;
         this.widget = this.ngModel;
 
@@ -90,25 +83,20 @@
                 };
         };
 
-        if (vm.widget.charttype == 'interactive') {
+        {
             var endDate = new Date();
             
             var startTime = function() {
             	var startDate = new Date();
                 switch (vm.widget.period)
                 {
-                    case 'h': startDate.setTime(endDate.getTime() - 60*60*1000); break;
-                    case '4h': startDate.setTime(endDate.getTime() - 4*60*60*1000); break;
-                    case '8h': startDate.setTime(endDate.getTime() - 8*60*60*1000); break;
-                    case '12h': startDate.setTime(endDate.getTime() - 12*60*60*1000); break;
-                    case 'D': startDate.setTime(endDate.getTime() - 24*60*60*1000); break;
-                    case '2D': startDate.setTime(endDate.getTime() - 2*24*60*60*1000); break;
-                    case '3D': startDate.setTime(endDate.getTime() - 3*24*60*60*1000); break;
                     case 'W':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 7.5*24*60*60*1000); break;
                     case '2W': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 2*7.25*24*60*60*1000); break;
                     case 'M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 1); break;
                     case '2M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 2); break;
+                    case '3M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 3); break;
                     case '4M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 4); break;
+                    case '6M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 6); break;
                     case 'Y': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setFullYear(endDate.getFullYear() - 1); break;
                     default: startDate.setTime(endDate.getTime() - 24*60*60*1000); break;
                 }
@@ -194,20 +182,6 @@
                                         distance = datapoint.time.getTime() - prevTime;
                                     }
 
-    /*                                // interpolate first datapoint if missing
-                                    if (finaldata.length == 1)
-                                    {
-                                        var distance = prevTime - startDate.getTime() - gridFactor; // will be negative
-                                        var newValue = parseFloat(datapoint.state);
-                                        var diff = newValue - prevValue;
-                                        //var insertValue = prevValue + diff / parseFloat(distance / gridFactor);
-                                        var insertValue = prevValue - diff / 2;
-                                        var insertpoint = {
-                                            state: insertValue,
-                                            time: startDate
-                                        }
-                                        finaldata.splice(0,0, insertpoint)
-                                    }*/
                                     finaldata.push(datapoint)
                                     prevTime = datapoint.time.getTime()
                                     prevValue = parseFloat(datapoint.state);
@@ -270,9 +244,6 @@
                         zoom: {
                             x: true
                         },
-                        liveUpdates: {
-                            enabled: false
-                        }
                     };
 
                     if (vm.widget.axis.y.min)
@@ -315,51 +286,9 @@
                         vm.interactiveChartOptions.series.push(seriesoptions);
                     }
 
-                    if(vm.widget.liveUpdates && vm.widget.liveUpdates.enabled){
-                        vm.interactiveChartOptions.liveUpdates.enabled = true;
-                        vm.interactiveChartOptions.liveUpdates.fillValues = vm.widget.liveUpdates.fillValues;
-                    }
-
                     vm.interactiveChartReady = true;
                 });
                 vm.interactiveChartReady = true;
-            };
-
-            var updateValue = function(item) {
-                var dataset = vm.datasets[item.name];
-                if(dataset) {
-                    // get last update time from dataset
-                    var lastUpdate = dataset[dataset.length-1].time;
-                    var receivedUpdate = {
-                        state: parseFloat(item.state),
-                        time: new Date()
-                    };
-                    // skip if not at least a minute old
-                    var period = (receivedUpdate.time.getTime() - lastUpdate.getTime())/1000;
-                    if (period < 60)
-                        return;
-                    var startDate = startTime();
-                    angular.forEach(vm.datasets, function(ds) {
-                        // push last value of other datasets to get nicer looking graphs 
-                        if(vm.interactiveChartOptions.liveUpdates.fillValues && dataset !== ds) {
-                            ds.push({
-                                state: ds[ds.length-1].state,
-                                time: new Date()
-                            });
-                        }
-
-                        // remove old values
-                        for(var i = 0; i < ds.length; i++) {
-                            if(ds[i].time > startDate) {
-                                ds.splice(0, i);
-                                break;
-                            }
-                        }
-                    });
-
-                    // add the received update
-                    dataset.push(receivedUpdate);
-                }
             };
 
             OHService.onUpdate($scope, vm.widget.item, function (value, item) {
@@ -367,48 +296,17 @@
                     $timeout(function () {
                         getData();
                     })
-                } else if (item && vm.interactiveChartOptions.liveUpdates.enabled) {
-                    updateValue(item);
                 }
             });
-        }
-
-        vm.imageQueryString = function(val) {
-            var ret = "";
-            if (vm.widget.isgroup)
-                ret = "groups=" + vm.widget.item;
-            else
-                ret = "items=" + vm.widget.item;
-            // if chartTheme is given, append the theme parameter.
-            // empty theme parameter renders the default theme.
-            var chartTheme = themeValueFilter(vm.widget.theme, 'chart-default-theme');
-            if (chartTheme) {
-                ret += '&theme=' + chartTheme.replace(/"/g, '');
-            }
-            // append legend parameter
-            if (vm.widget.showlegend) {
-                switch (vm.widget.showlegend) {
-                    case "auto":
-                        // do not append anything, as 'automatic' is the default
-                        break;
-                    case "always":
-                        ret += "&legend=true";
-                        break;
-                    case "never":
-                        ret += "&legend=false";
-                        break;
-                }
-            }
-            return ret + "&period=" + vm.widget.period;
         }
 
     }
 
 
     // settings dialog
-    WidgetSettingsCtrlChart.$inject = ['$scope', '$timeout', '$rootScope', '$uibModalInstance', 'widget', 'OHService'];
+    WidgetSettingsCtrlStats.$inject = ['$scope', '$timeout', '$rootScope', '$uibModalInstance', 'widget', 'OHService'];
 
-    function WidgetSettingsCtrlChart($scope, $timeout, $rootScope, $modalInstance, widget, OHService) {
+    function WidgetSettingsCtrlStats($scope, $timeout, $rootScope, $modalInstance, widget, OHService) {
         $scope.widget = widget;
         $scope.items = OHService.getItems();
 
@@ -419,14 +317,12 @@
             col: widget.col,
             row: widget.row,
             item: widget.item,
-            charttype: widget.charttype,
             service: widget.service,
             period: widget.period,
             showlegend: widget.showlegend,
             refresh: widget.refresh,
             axis: widget.axis || {y: {}, y2: {} },
-            series: widget.series || [],
-            liveUpdates: widget.liveUpdates || {}
+            series: widget.series || []
         };
         if (!$scope.form.axis.y2)
             $scope.form.axis.y2 = { enabled: false };
@@ -479,18 +375,9 @@
 
         $scope.submit = function() {
             angular.extend(widget, $scope.form);
-            if (widget.charttype !== "interactive") {
-                delete widget.axis;
-                delete widget.series;
-                var item = OHService.getItem(widget.item);
-                widget.isgroup = (item && (item.type === "Group" || item.type === "GroupItem"));
-            } else {
-                if (!widget.axis.y2.enabled)
-                    delete widget.axis.y2;
-            }
-            if (widget.charttype !== "default") {
-                delete widget.showlegend;
-            }
+            if (!widget.axis.y2.enabled)
+                delete widget.axis.y2;
+            delete widget.showlegend;
 
             $modalInstance.close(widget);
         };
