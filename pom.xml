@@ -71,10 +71,6 @@
     <karaf.version>4.4.6</karaf.version>
     <ohc.version>4.3.0-SNAPSHOT</ohc.version>
     <sat.version>0.16.0</sat.version>
-    <spotless.version>2.43.0</spotless.version>
-    <!-- Eclipse Java formatter version 4.26+ does not check test files -->
-    <spotless.eclipse.version>4.25</spotless.eclipse.version>
-    <spotless.eclipse.wtp.version>4.21.0</spotless.eclipse.wtp.version>
   </properties>
 
   <build>
@@ -325,12 +321,6 @@ Import-Package: \\
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>3.3.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.2.5</version>
           <configuration>
@@ -449,96 +439,6 @@ Import-Package: \\
         </plugin>
 
         <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${spotless.version}</version>
-          <configuration>
-            <java>
-              <eclipse>
-                <file>openhab_codestyle.xml</file>
-                <version>${spotless.eclipse.version}</version>
-              </eclipse>
-              <removeUnusedImports/>
-              <importOrder>
-                <file>openhab.importorder</file>
-              </importOrder>
-              <endWithNewline/>
-            </java>
-            <formats>
-              <format>
-                <!-- *.xml -->
-                <includes>
-                  <include>src/**/*.xml</include>
-                </includes>
-                <excludes>
-                  <exclude>**/pom.xml</exclude>
-                  <exclude>**/feature.xml</exclude>
-                  <exclude>src/main/history/**/*.xml</exclude>
-                  <exclude>src/main/resources/header.xml</exclude>
-                  <exclude>src/main/resources/footer.xml</exclude>
-                  <exclude>src/test/resources/**/*.xml</exclude>
-                </excludes>
-                <eclipseWtp>
-                  <type>XML</type>
-                  <files>
-                    <file>openhab_wst_xml_files.prefs</file>
-                  </files>
-                  <version>${spotless.eclipse.wtp.version}</version>
-                </eclipseWtp>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
-              </format>
-              <format>
-                <!-- feature.xml -->
-                <includes>
-                  <include>**/src/main/feature/feature.xml</include>
-                </includes>
-                <eclipseWtp>
-                  <type>XML</type>
-                  <files>
-                    <file>openhab_wst_feature_file.prefs</file>
-                  </files>
-                  <version>${spotless.eclipse.wtp.version}</version>
-                </eclipseWtp>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
-              </format>
-              <format>
-                <!-- pom.xml -->
-                <includes>
-                  <include>pom.xml</include>
-                </includes>
-                <eclipseWtp>
-                  <type>XML</type>
-                  <files>
-                    <file>openhab_wst_pom_file.prefs</file>
-                  </files>
-                  <version>${spotless.eclipse.wtp.version}</version>
-                </eclipseWtp>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
-              </format>
-            </formats>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.openhab.tools</groupId>
-              <artifactId>openhab-codestyle</artifactId>
-              <version>${sat.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>codestyle_check</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>initialize</phase>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>1.15.0</version>
@@ -598,10 +498,6 @@ Import-Package: \\
         <artifactId>sortpom-maven-plugin</artifactId>
       </plugin>
 
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-      </plugin>
     </plugins>
     <extensions>
       <extension>
