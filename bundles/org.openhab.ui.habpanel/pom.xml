@@ -47,6 +47,7 @@
                   <directory>web</directory>
                   <targetPath>web</targetPath>
                   <excludes>
+                    <exclude>**/node_modules/**</exclude>
                     <exclude>bower.json</exclude>
                     <exclude>gulpfile.js</exclude>
                     <exclude>.eslintrc.yaml</exclude>

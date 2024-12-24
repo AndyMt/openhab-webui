@@ -88,18 +88,20 @@
             
             var startTime = function() {
             	var startDate = new Date();
+                const oneHour = 60*60*1000;
                 switch (vm.widget.period)
                 {
-                    case '3D': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 3.1*24*60*60*1000); break;
-                    case 'W':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 7.5*24*60*60*1000); break;
-                    case '2W': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 2*7.25*24*60*60*1000); break;
-                    case 'M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 1); break;
-                    case '2M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 2); break;
-                    case '3M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 3); break;
-                    case '4M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 4); break;
-                    case '6M': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 6); break;
-                    case 'Y': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setFullYear(endDate.getFullYear() - 1); break;
-                    default: startDate.setTime(endDate.getTime() - 24*60*60*1000); break;
+                    case '3D':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 3*24*oneHour); break;
+                    case 'W':   endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 7*24*oneHour); break;
+                    case '10D': endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 10*24*oneHour); break;
+                    case '2W':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setTime(endDate.getTime() - 2*7*24*oneHour); break;
+                    case 'M':   endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 1); break;
+                    case '2M':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 2); break;
+                    case '3M':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 3); break;
+                    case '4M':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 4); break;
+                    case '6M':  endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setMonth(endDate.getMonth() - 6); break;
+                    case 'Y':   endDate.setTime(endDate.setHours(0,0,0,0)); startDate.setFullYear(endDate.getFullYear() - 1); break;
+                    default: startDate.setTime(endDate.getTime() - 24*oneHour); break;
                 }
                 return startDate;
             }
@@ -126,44 +128,58 @@
 	                    var seriesname = values[i].data.name;
 
                         var finaldata = [];
-                        finaldata = values[i].data.data;
 
-                        angular.forEach(finaldata, function (datapoint) {
+                        angular.forEach(values[i].data.data, function (datapoint) {
                             datapoint.state = datapoint.state.replace("ON",1);
                             datapoint.state = datapoint.state.replace("OFF",0);
                             datapoint.time = new Date(datapoint.time);
+                            datapoint.time.setHours(12,0,0,0)
                             datapoint.state = parseFloat(datapoint.state);
+                            finaldata.push(datapoint);
                         });
-                        var endPoint = {
-                            state: null,
-                            time: endDate
-                        }
-                        finaldata.push(endPoint);
 
                         vm.datasets[seriesname] = finaldata;
                     }
 
-                    var tickCount = Width < 400 ? 6 : 12;
+                    var days = Math.round((endDate.valueOf() - startDate.valueOf())/3600/24/1000)
+                    var tickCount = days;
 
                     vm.interactiveChartOptions = {
                         margin: {
-                            top: 20,
-                            bottom: 50
+                            right: 0,                            
+                            top: 22,
+                            bottom: 45
                         },
+                        
                         series: [],
                         axes: {
                             x: {
                                 key: "time",
                                 type: "date",
                                 ticks: tickCount,
+                                min: startDate,
+                                max: endDate,
+                                ticksShift: {
+                                    x: 2+Math.round((Width-100)/days/2)
+                                },                                        
                                 tickFormat: function (value) {
+                                    var now = new Date()
+                                    var cmp = new Date(value)
+                                    // don't show label for today
+                                    if (cmp.setHours(12,0,0,0).valueOf() === now.setHours(12,0,0,0).valueOf())
+                                        return "";
+
                                     if (vm.widget.period === 'W')
                                     {
-                                        return value.getHours() === 0 ? "": $filter('date')(value, 'EEE d');
+                                        return $filter('date')(value, 'EEE d');
+                                    }
+                                    else if (vm.widget.period === '10D')
+                                    {
+                                        return $filter('date')(value, 'EEE d');
                                     }
                                     else if (vm.widget.period === '2W')
                                     {
-                                        return value.getHours() === 0 ? "            "+$filter('date')(value, 'EEE d') : "";
+                                        return $filter('date')(value, 'EEE d');
                                     }
                                     else if (value.getHours() === 0) 
                                     {
@@ -208,12 +224,14 @@
                             axis: vm.widget.series[i].axis,
                             dataset: vm.widget.series[i].item,
                             key: "state",
+                            defined: function(value) {
+                                return value.y1 !== undefined;
+                            },                            
                             label: vm.widget.series[i].name || vm.widget.series[i].item,
                             color: themeValueFilter(vm.widget.series[i].color, 'primary-color'),
-                            type: [],
+                            type: "column",
                             id: vm.widget.series[i].item
                         };
-                        seriesoptions.type.push("column");
 
                         vm.interactiveChartOptions.series.push(seriesoptions);
                     }
